@@ -1,5 +1,8 @@
 # **Arivu Foods Supply Chain Management System**
 
+## Project Status
+Version: 0.1.0
+
 ## **Overview**
 
 The Arivu Foods Supply Chain Management System (SCMS) is designed to streamline and optimize the distribution of food products, emphasizing efficient batch management, dynamic pricing, comprehensive sales analytics, and automated critical alerts. Tailored for perishable goods, this system aims to enhance operational efficiency, ensure product freshness, strengthen retailer relationships, and provide critical data visibility for informed decision-making.
@@ -71,13 +74,17 @@ The Arivu Foods Supply Chain Management System (SCMS) is designed to streamline 
    * Set up a Python virtual environment.  
    * Install required Python packages (e.g., Flask, SQLAlchemy or Django, psycopg2 for PostgreSQL).  
    * Configure your database connection.  
-   * Run database migrations to create the schema.  
+   * Run database migrations to create the schema. Use the SQL files in `db/migrations`.  
    * Start the backend server.  
 3. **Frontend Setup (HTML/Bootstrap):**  
    * Open the index.html file in your web browser.  
    * Ensure all necessary Bootstrap and custom CSS/JS files are linked correctly.
 
 *(Detailed installation and configuration instructions will be provided in a separate CONTRIBUTING.md or INSTALL.md file.)*
+
+## Recent Changes
+* Added initial migration scripts under db/migrations.
+* Database schema now implemented as per schemadb.md.
 
 ## **Future Enhancements**
 
