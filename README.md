@@ -1,7 +1,7 @@
 # **Arivu Foods Supply Chain Management System**
 
 ## Project Status
-Version: 0.1.0
+Version: 0.2.0
 
 ## **Overview**
 
@@ -69,22 +69,21 @@ The Arivu Foods Supply Chain Management System (SCMS) is designed to streamline 
 1. **Clone the Repository:**  
    git clone https://github.com/arivufoods/supply-chain-management-system.git  
    cd supply-chain-management-system
-
-2. **Backend Setup (Python):**  
-   * Set up a Python virtual environment.  
-   * Install required Python packages (e.g., Flask, SQLAlchemy or Django, psycopg2 for PostgreSQL).  
-   * Configure your database connection.  
-   * Run database migrations to create the schema. Use the SQL files in `db/migrations`.  
-   * Start the backend server.  
-3. **Frontend Setup (HTML/Bootstrap):**  
-   * Open the index.html file in your web browser.  
-   * Ensure all necessary Bootstrap and custom CSS/JS files are linked correctly.
-
+2. **Backend Setup (Python):**
+   * Set up a Python virtual environment and install packages from `requirements.txt`.
+   * Copy `.env.example` to `.env` and update `DATABASE_URL`.
+   * Run migrations found in `db/migrations` against your database.
+   * Launch the API using `python -m backend.run`.
+3. **Frontend Setup (HTML/Bootstrap):**
+   * Open `frontend/index.html` in your browser to verify the API connection.
 *(Detailed installation and configuration instructions will be provided in a separate CONTRIBUTING.md or INSTALL.md file.)*
 
 ## Recent Changes
 * Added initial migration scripts under db/migrations.
 * Database schema now implemented as per schemadb.md.
+* Added Flask backend skeleton with health check endpoint.
+* Created simple Bootstrap frontend calling the API.
+* Added basic architecture docs and requirements file.
 
 ## **Future Enhancements**
 
