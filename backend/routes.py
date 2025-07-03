@@ -503,6 +503,176 @@ def get_weather():
         return jsonify({'error': str(e)}), 500
 
 
+# Order Management APIs
+@bp.route('/orders', methods=['GET'])
+def get_orders():
+    """Get all orders with optional filtering."""
+    try:
+        query = Order.query.join(Retailer)
+        
+        # Filter by retailer if provided
+        retailer_id = request.args.get('retailer_id')
+        if retailer_id:
+            query = query.filter(Order.retailer_id == retailer_id)
+            
+        # Filter by status if provided
+        status = request.args.get('status')
+        if status:
+            query = query.filter(Order.order_status == status)
+            
+        # Filter by date range
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        if start_date:
+            query = query.filter(Order.order_date >= datetime.strptime(start_date, '%Y-%m-%d'))
+        if end_date:
+            query = query.filter(Order.order_date <= datetime.strptime(end_date, '%Y-%m-%d'))
+            
+        orders = query.order_by(desc(Order.order_date)).all()
+        
+        return jsonify([{
+            'order_id': o.order_id,
+            'retailer_name': o.retailer.retailer_name,
+            'order_date': o.order_date.isoformat(),
+            'total_amount': float(o.total_amount),
+            'order_status': o.order_status,
+            'expected_delivery_date': o.expected_delivery_date.isoformat() if o.expected_delivery_date else None,
+            'discount_applied_overall': float(o.discount_applied_overall)
+        } for o in orders])
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/orders', methods=['POST'])
+def create_order():
+    """Create a new order with line items."""
+    try:
+        data = request.get_json()
+        
+        # Create order
+        order = Order(
+            retailer_id=data['retailer_id'],
+            order_date=datetime.utcnow(),
+            total_amount=Decimal('0.00'),  # Will be calculated
+            order_status='Pending',
+            delivery_address=data['delivery_address'],
+            expected_delivery_date=datetime.strptime(data['expected_delivery_date'], '%Y-%m-%d').date() if data.get('expected_delivery_date') else None
+        )
+        
+        db.session.add(order)
+        db.session.flush()  # Get order ID
+        
+        total_amount = Decimal('0.00')
+        
+        # Create order items
+        for item_data in data['items']:
+            # Get pricing for this retailer
+            pricing_response = calculate_pricing_internal(
+                item_data['product_id'],
+                data['retailer_id'],
+                item_data['quantity']
+            )
+            
+            # Allocate batch (FIFO/FEFO)
+            batch = allocate_batch_quantity(
+                item_data['product_id'],
+                item_data['quantity']
+            )
+            
+            if not batch:
+                raise ValueError(f"Insufficient stock for product {item_data['product_id']}")
+            
+            order_item = OrderItem(
+                order_id=order.order_id,
+                product_id=item_data['product_id'],
+                batch_id=batch.batch_id,
+                quantity=Decimal(str(item_data['quantity'])),
+                unit_price=Decimal(str(pricing_response['base_price'])),
+                discount_percentage=Decimal(str(pricing_response['discount_percentage'])),
+                actual_sales_price=Decimal(str(pricing_response['final_price'])),
+                line_total=Decimal(str(pricing_response['total_amount']))
+            )
+            
+            db.session.add(order_item)
+            total_amount += order_item.line_total
+        
+        # Update order total
+        order.total_amount = total_amount
+        
+        db.session.commit()
+        
+        return jsonify({
+            'order_id': order.order_id,
+            'total_amount': float(total_amount),
+            'message': 'Order created successfully'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+def calculate_pricing_internal(product_id, retailer_id, quantity):
+    """Internal function to calculate pricing."""
+    product = Product.query.get(product_id)
+    retailer = Retailer.query.get(retailer_id)
+    
+    if not product or not retailer:
+        raise ValueError('Product or retailer not found')
+        
+    base_price = product.mrp
+    discount_percentage = 0
+    
+    if retailer.pricing_tier:
+        discount_percentage = (retailer.pricing_tier.min_discount_percentage + 
+                             retailer.pricing_tier.max_discount_percentage) / 2
+    
+    discount_amount = base_price * (discount_percentage / 100)
+    final_price = base_price - discount_amount
+    
+    return {
+        'base_price': float(base_price),
+        'discount_percentage': float(discount_percentage),
+        'discount_amount': float(discount_amount),
+        'final_price': float(final_price),
+        'total_amount': float(final_price * quantity)
+    }
+
+
+def allocate_batch_quantity(product_id, required_quantity):
+    """Allocate quantity from available batches using FIFO/FEFO."""
+    # Get available batches ordered by expiration date (FEFO)
+    batches = Batch.query.filter(
+        Batch.product_id == product_id,
+        Batch.status == 'In Stock',
+        Batch.current_quantity > 0
+    ).order_by(asc(Batch.expiration_date)).all()
+    
+    remaining_quantity = Decimal(str(required_quantity))
+    
+    for batch in batches:
+        if remaining_quantity <= 0:
+            break
+            
+        if batch.current_quantity >= remaining_quantity:
+            # This batch has enough quantity
+            batch.current_quantity -= remaining_quantity
+            remaining_quantity = 0
+            return batch
+        else:
+            # Take all from this batch and continue
+            remaining_quantity -= batch.current_quantity
+            batch.current_quantity = 0
+            batch.status = 'Dispatched'
+    
+    if remaining_quantity > 0:
+        # Insufficient stock
+        return None
+    
+    return batches[0]  # Return the first batch used
+
+
 # Dashboard Summary API
 @bp.route('/dashboard/summary', methods=['GET'])
 def get_dashboard_summary():
