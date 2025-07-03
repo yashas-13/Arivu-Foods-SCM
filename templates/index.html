@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arivu Foods SCMS - Mobile Dashboard</title>
+    
+    <!-- Bootstrap 5 for mobile-first design -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS for mobile optimization -->
+    <style>
+        :root {
+            --arivu-primary: #2c5530;
+            --arivu-secondary: #4a7c59;
+            --arivu-success: #198754;
+            --arivu-warning: #ffc107;
+            --arivu-danger: #dc3545;
+            --arivu-light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--arivu-light);
+            padding-top: 76px; /* Account for fixed navbar */
+        }
+        
+        .navbar {
+            background-color: var(--arivu-primary) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            background-color: var(--arivu-secondary);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            border: none;
+            font-weight: 600;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .alert-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--arivu-primary);
+            border-color: var(--arivu-primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--arivu-secondary);
+            border-color: var(--arivu-secondary);
+        }
+        
+        .quick-action {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #e9ecef;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-action:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .quick-action i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--arivu-primary);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        .status-success { background-color: var(--arivu-success); }
+        .status-warning { background-color: var(--arivu-warning); }
+        .status-danger { background-color: var(--arivu-danger); }
+        
+        /* Mobile optimizations */
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                margin-bottom: 0.75rem;
+            }
+            
+            .quick-action {
+                padding: 0.75rem;
+            }
+            
+            .quick-action i {
+                font-size: 1.25rem;
+                margin-right: 0.75rem;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        
+        .error {
+            color: var(--arivu-danger);
+            text-align: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-boxes"></i> Arivu Foods SCMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#alerts">
+                            <i class="bi bi-bell"></i> Alerts
+                            <span class="badge bg-danger ms-1" id="alert-count">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Dashboard Metrics -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3">
+                    <i class="bi bi-speedometer2"></i> Dashboard Overview
+                </h2>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="row" id="metrics-container">
+            <div class="col-6 col-md-3">
+                <div class="card metric-card">
+                    <div class="metric-value text-primary" id="total-products">-</div>
+                    <div class="metric-label">Total Products</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card metric-card">
+                    <div class="metric-value text-warning" id="low-stock-count">-</div>
+                    <div class="metric-label">Low Stock Items</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card metric-card">
+                    <div class="metric-value text-danger" id="expiry-alerts">-</div>
+                    <div class="metric-label">Expiring Soon</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card metric-card">
+                    <div class="metric-value text-success" id="active-batches">-</div>
+                    <div class="metric-label">Active Batches</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div class="row mb-4" id="alerts">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-exclamation-triangle"></i> Active Alerts</span>
+                        <button class="btn btn-sm btn-light" onclick="refreshAlerts()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    <div class="card-body" id="alerts-content">
+                        <div class="loading">Loading alerts...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-lightning"></i> Quick Actions
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="#" class="quick-action" onclick="showInventoryModal()">
+                                    <i class="bi bi-box-seam"></i>
+                                    <div>
+                                        <div class="fw-bold">View Inventory</div>
+                                        <small class="text-muted">Check stock levels</small>
+                                    </div>
+                                </a>
+                                <a href="#" class="quick-action" onclick="showPricingModal()">
+                                    <i class="bi bi-tags"></i>
+                                    <div>
+                                        <div class="fw-bold">Pricing Calculator</div>
+                                        <small class="text-muted">Calculate retailer prices</small>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#" class="quick-action" onclick="showBatchModal()">
+                                    <i class="bi bi-layers"></i>
+                                    <div>
+                                        <div class="fw-bold">Batch Management</div>
+                                        <small class="text-muted">Manage product batches</small>
+                                    </div>
+                                </a>
+                                <a href="#" class="quick-action" onclick="showAnalyticsModal()">
+                                    <i class="bi bi-graph-up"></i>
+                                    <div>
+                                        <div class="fw-bold">Sales Analytics</div>
+                                        <small class="text-muted">View performance reports</small>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-clock-history"></i> Recent Activity
+                    </div>
+                    <div class="card-body" id="recent-activity">
+                        <div class="loading">Loading recent activity...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Quick Actions -->
+    
+    <!-- Inventory Modal -->
+    <div class="modal fade" id="inventoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Inventory Overview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="inventory-content">
+                    <div class="loading">Loading inventory data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div class="modal fade" id="pricingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pricing Calculator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="pricing-form">
+                        <div class="mb-3">
+                            <label class="form-label">Retailer</label>
+                            <select class="form-select" id="retailer-select" required>
+                                <option value="">Select Retailer...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product</label>
+                            <select class="form-select" id="product-select" required>
+                                <option value="">Select Product...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity-input" value="1" min="0.1" step="0.1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Calculate Price</button>
+                    </form>
+                    <div id="pricing-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // API Base URL
+        const API_BASE = '/api';
+        
+        // Global variables
+        let dashboardData = {};
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            loadAlerts();
+            loadRecentActivity();
+            
+            // Refresh every 5 minutes
+            setInterval(loadDashboardData, 5 * 60 * 1000);
+        });
+        
+        // Load dashboard metrics
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics/dashboard/`);
+                if (!response.ok) throw new Error('Failed to load dashboard data');
+                
+                dashboardData = await response.json();
+                updateDashboardMetrics();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('dashboard-metrics', 'Failed to load dashboard data');
+            }
+        }
+        
+        // Update dashboard metrics in UI
+        function updateDashboardMetrics() {
+            document.getElementById('total-products').textContent = dashboardData.inventory?.total_items || '0';
+            document.getElementById('low-stock-count').textContent = dashboardData.alerts?.alerts_by_type?.low_stock || '0';
+            document.getElementById('expiry-alerts').textContent = dashboardData.alerts?.alerts_by_type?.expiry_warning || '0';
+            document.getElementById('active-batches').textContent = dashboardData.inventory?.total_items || '0';
+            
+            // Update alert badge
+            const totalAlerts = dashboardData.alerts?.active_alerts || 0;
+            document.getElementById('alert-count').textContent = totalAlerts;
+        }
+        
+        // Load alerts
+        async function loadAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/alerts/active/`);
+                if (!response.ok) throw new Error('Failed to load alerts');
+                
+                const alerts = await response.json();
+                displayAlerts(alerts);
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                document.getElementById('alerts-content').innerHTML = '<div class="error">Failed to load alerts</div>';
+            }
+        }
+        
+        // Display alerts
+        function displayAlerts(alerts) {
+            const container = document.getElementById('alerts-content');
+            
+            if (!alerts || alerts.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">No active alerts</div>';
+                return;
+            }
+            
+            const alertsHtml = alerts.slice(0, 5).map(alert => `
+                <div class="d-flex justify-content-between align-items-start mb-2 p-2 border-start border-${getPriorityColor(alert.priority)} border-3">
+                    <div>
+                        <div class="fw-bold">${alert.title}</div>
+                        <small class="text-muted">${alert.message.substring(0, 100)}...</small>
+                        <div class="mt-1">
+                            <span class="badge alert-badge bg-${getPriorityColor(alert.priority)}">${alert.priority.toUpperCase()}</span>
+                            <span class="badge alert-badge bg-secondary">${alert.alert_type.replace('_', ' ').toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="acknowledgeAlert('${alert.alert_id}')">
+                            <i class="bi bi-check"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = alertsHtml;
+        }
+        
+        // Get priority color for alerts
+        function getPriorityColor(priority) {
+            switch(priority) {
+                case 'critical': return 'danger';
+                case 'high': return 'warning';
+                case 'medium': return 'info';
+                case 'low': return 'secondary';
+                default: return 'secondary';
+            }
+        }
+        
+        // Load recent activity
+        async function loadRecentActivity() {
+            const container = document.getElementById('recent-activity');
+            
+            // Mock recent activity for now
+            const activities = [
+                { type: 'batch_received', message: 'New batch of Organic Mango Pulp received', time: '2 hours ago' },
+                { type: 'low_stock', message: 'Low stock alert for Turmeric Powder', time: '3 hours ago' },
+                { type: 'order_fulfilled', message: 'Order #ORD-20241201-ABC123 fulfilled', time: '5 hours ago' },
+            ];
+            
+            const activitiesHtml = activities.map(activity => `
+                <div class="d-flex align-items-center mb-2">
+                    <span class="status-indicator status-${getActivityColor(activity.type)}"></span>
+                    <div class="flex-grow-1">
+                        <div>${activity.message}</div>
+                        <small class="text-muted">${activity.time}</small>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = activitiesHtml;
+        }
+        
+        // Get activity color
+        function getActivityColor(type) {
+            switch(type) {
+                case 'batch_received': return 'success';
+                case 'low_stock': return 'warning';
+                case 'order_fulfilled': return 'success';
+                default: return 'success';
+            }
+        }
+        
+        // Refresh alerts
+        function refreshAlerts() {
+            loadAlerts();
+        }
+        
+        // Acknowledge alert
+        async function acknowledgeAlert(alertId) {
+            try {
+                const response = await fetch(`${API_BASE}/alerts/${alertId}/acknowledge/`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    loadAlerts(); // Refresh alerts
+                    loadDashboardData(); // Refresh metrics
+                }
+            } catch (error) {
+                console.error('Error acknowledging alert:', error);
+            }
+        }
+        
+        // Show inventory modal
+        function showInventoryModal() {
+            const modal = new bootstrap.Modal(document.getElementById('inventoryModal'));
+            modal.show();
+            loadInventoryData();
+        }
+        
+        // Load inventory data
+        async function loadInventoryData() {
+            try {
+                const response = await fetch(`${API_BASE}/inventory/summary/`);
+                if (!response.ok) throw new Error('Failed to load inventory data');
+                
+                const data = await response.json();
+                displayInventoryData(data);
+            } catch (error) {
+                document.getElementById('inventory-content').innerHTML = '<div class="error">Failed to load inventory data</div>';
+            }
+        }
+        
+        // Display inventory data
+        function displayInventoryData(data) {
+            const html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="h3">${data.total_items || 0}</div>
+                                <div class="text-muted">Total Items</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="h3">₹${(data.total_value || 0).toLocaleString()}</div>
+                                <div class="text-muted">Total Value</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="alert alert-warning">
+                        <strong>${data.low_stock_alerts || 0}</strong> items have low stock
+                    </div>
+                    <div class="alert alert-danger">
+                        <strong>${data.expiry_alerts || 0}</strong> items expiring soon
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('inventory-content').innerHTML = html;
+        }
+        
+        // Show pricing modal
+        function showPricingModal() {
+            const modal = new bootstrap.Modal(document.getElementById('pricingModal'));
+            modal.show();
+            loadRetailersAndProducts();
+        }
+        
+        // Load retailers and products for pricing
+        async function loadRetailersAndProducts() {
+            try {
+                // Load retailers
+                const retailersResponse = await fetch(`${API_BASE}/pricing/retailers/`);
+                const retailers = await retailersResponse.json();
+                
+                const retailerSelect = document.getElementById('retailer-select');
+                retailerSelect.innerHTML = '<option value="">Select Retailer...</option>';
+                retailers.results?.forEach(retailer => {
+                    retailerSelect.innerHTML += `<option value="${retailer.retailer_id}">${retailer.retailer_name}</option>`;
+                });
+                
+                // Load products
+                const productsResponse = await fetch(`${API_BASE}/inventory/products/`);
+                const products = await productsResponse.json();
+                
+                const productSelect = document.getElementById('product-select');
+                productSelect.innerHTML = '<option value="">Select Product...</option>';
+                products.results?.forEach(product => {
+                    productSelect.innerHTML += `<option value="${product.product_id}">${product.product_name}</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Error loading retailers and products:', error);
+            }
+        }
+        
+        // Handle pricing form submission
+        document.getElementById('pricing-form')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const retailerId = document.getElementById('retailer-select').value;
+            const productId = document.getElementById('product-select').value;
+            const quantity = document.getElementById('quantity-input').value;
+            
+            if (!retailerId || !productId) {
+                alert('Please select retailer and product');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/pricing/calculate/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        retailer_id: retailerId,
+                        product_id: productId,
+                        quantity: parseFloat(quantity)
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to calculate pricing');
+                
+                const result = await response.json();
+                displayPricingResult(result);
+                
+            } catch (error) {
+                console.error('Error calculating pricing:', error);
+                document.getElementById('pricing-result').innerHTML = '<div class="alert alert-danger">Failed to calculate pricing</div>';
+            }
+        });
+        
+        // Display pricing result
+        function displayPricingResult(result) {
+            const html = `
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Pricing Result</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Base Price:</strong><br>
+                                ₹${result.base_price}
+                            </div>
+                            <div class="col-6">
+                                <strong>Final Price:</strong><br>
+                                ₹${result.final_price}
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Total Discount:</strong> ₹${result.total_discount} (${result.total_discount_percentage.toFixed(2)}%)
+                        </div>
+                        ${result.applied_discounts.length > 0 ? `
+                            <div class="mt-2">
+                                <strong>Applied Discounts:</strong>
+                                <ul class="list-unstyled mt-1">
+                                    ${result.applied_discounts.map(discount => `
+                                        <li><small>${discount.name}: ₹${discount.discount_amount} (${discount.discount_percentage.toFixed(2)}%)</small></li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('pricing-result').innerHTML = html;
+        }
+        
+        // Show batch modal (placeholder)
+        function showBatchModal() {
+            alert('Batch management interface coming soon!');
+        }
+        
+        // Show analytics modal (placeholder)
+        function showAnalyticsModal() {
+            alert('Analytics interface coming soon!');
+        }
+        
+        // Utility function to show errors
+        function showError(containerId, message) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `<div class="error">${message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

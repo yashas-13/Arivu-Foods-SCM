@@ -64,26 +64,55 @@ The Arivu Foods Supply Chain Management System (SCMS) is designed to streamline 
 * **IoT (Internet of Things):** (Future consideration) Sensors for real-time temperature/humidity monitoring of perishable goods during storage and transit.  
 * **AI/ML (Artificial Intelligence/Machine Learning):** (Future consideration) For advanced demand forecasting, route optimization, and more sophisticated dynamic pricing algorithms.
 
-## **Getting Started (High-Level)**
+## **Getting Started (Django Setup)**
 
 1. **Clone the Repository:**  
-   git clone https://github.com/arivufoods/supply-chain-management-system.git  
-   cd supply-chain-management-system
-2. **Backend Setup (Python):**
-   * Set up a Python virtual environment and install packages from `requirements.txt`.
-   * Copy `.env.example` to `.env` and update `DATABASE_URL`.
-   * Run migrations found in `db/migrations` against your database.
-   * Launch the API using `python -m backend.run`.
-3. **Frontend Setup (HTML/Bootstrap):**
-   * Open `frontend/index.html` in your browser to verify the API connection.
-*(Detailed installation and configuration instructions will be provided in a separate CONTRIBUTING.md or INSTALL.md file.)*
+   ```bash
+   git clone https://github.com/yashas-13/Arivu-Foods-SCM.git  
+   cd Arivu-Foods-SCM
+   ```
+
+2. **Backend Setup (Django):**
+   ```bash
+   # Install Python dependencies
+   pip install -r requirements.txt
+   
+   # Run database migrations
+   python manage.py migrate
+   
+   # Create a superuser (optional)
+   python manage.py createsuperuser
+   
+   # Create sample data
+   python manage.py create_sample_data
+   
+   # Start the Django development server
+   python manage.py runserver 0.0.0.0:8000
+   ```
+
+3. **Access the Application:**
+   - **Main Dashboard:** http://localhost:8000/ (Mobile-first interface)
+   - **Django Admin:** http://localhost:8000/admin/ (Admin interface)
+   - **API Documentation:** Available at /api/ endpoints
+
+## **Mobile-First Architecture**
+
+The system is designed with a mobile-first approach:
+- **Responsive Bootstrap 5** for optimal mobile experience
+- **Touch-friendly interface** with large buttons and cards
+- **Progressive Web App** capabilities for mobile deployment
+- **Termux-optimized** development environment
+- **API-first design** for mobile app integration
 
 ## Recent Changes
-* Added initial migration scripts under db/migrations.
-* Database schema now implemented as per schemadb.md.
-* Added Flask backend skeleton with health check endpoint.
-* Created simple Bootstrap frontend calling the API.
-* Added basic architecture docs and requirements file.
+* **MAJOR:** Migrated from Flask to Django for enhanced scalability
+* **NEW:** Mobile-first responsive dashboard with real-time metrics
+* **NEW:** Complete FIFO/FEFO inventory management system
+* **NEW:** Dynamic pricing engine with retailer-specific discounts
+* **NEW:** Automated alert system for expiry and stock warnings
+* **NEW:** Comprehensive analytics and reporting modules
+* **NEW:** Django admin interface for data management
+* **NEW:** Sample data generation with realistic food products
 
 ## **Future Enhancements**
 
