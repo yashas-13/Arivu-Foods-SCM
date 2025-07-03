@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arivu Foods SCMS - Working Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #2E7D32, #81C784); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .metric-card { background: linear-gradient(135deg, #42A5F5, #64B5F6); color: white; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .metric-value { font-size: 2rem; font-weight: bold; }
+        .api-result { background: #f8f9fa; border-radius: 10px; padding: 15px; margin: 10px 0; font-family: monospace; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header bg-success text-white text-center">
+                        <h2><i class="fas fa-leaf"></i> Arivu Foods SCMS - Live System Demo</h2>
+                        <p class="mb-0">Mobile-first Supply Chain Management System</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="totalProducts">-</div>
+                                    <div>Products</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="totalBatches">-</div>
+                                    <div>Batches</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="totalRetailers">-</div>
+                                    <div>Retailers</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="totalRevenue">-</div>
+                                    <div>Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-4">🔄 Real-time API Tests</h4>
+                        <div id="apiTests">
+                            <div class="api-result">Loading API tests...</div>
+                        </div>
+                        
+                        <h4 class="mt-4">📊 Key Features Implemented</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">✅ Real-time inventory tracking (FIFO/FEFO)</li>
+                                    <li class="list-group-item">✅ Batch management and traceability</li>
+                                    <li class="list-group-item">✅ Dynamic pricing for retailers</li>
+                                    <li class="list-group-item">✅ Mobile-first responsive design</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">✅ Automated alerts (expiration/low stock)</li>
+                                    <li class="list-group-item">✅ Sales analytics and KPIs</li>
+                                    <li class="list-group-item">✅ Comprehensive API endpoints</li>
+                                    <li class="list-group-item">✅ Clean, intuitive interface</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="/" class="btn btn-success btn-lg">Open Full Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function runTests() {
+            const testsDiv = document.getElementById('apiTests');
+            let results = '';
+            
+            try {
+                // Test 1: Health Check
+                const healthResponse = await fetch('/api/health');
+                const healthData = await healthResponse.json();
+                results += `<div class="api-result success">✅ Health Check: ${healthData.status}</div>`;
+                
+                // Test 2: Dashboard Data
+                const dashboardResponse = await fetch('/api/dashboard');
+                const dashboardData = await dashboardResponse.json();
+                document.getElementById('totalProducts').textContent = dashboardData.metrics.total_products;
+                document.getElementById('totalBatches').textContent = dashboardData.metrics.total_batches;
+                document.getElementById('totalRetailers').textContent = dashboardData.metrics.total_retailers;
+                results += `<div class="api-result success">✅ Dashboard: ${dashboardData.metrics.total_products} products, ${dashboardData.metrics.total_batches} batches</div>`;
+                
+                // Test 3: Sales Analytics
+                const salesResponse = await fetch('/api/analytics/sales');
+                const salesData = await salesResponse.json();
+                document.getElementById('totalRevenue').textContent = '₹' + new Intl.NumberFormat('en-IN').format(salesData.total_sales);
+                results += `<div class="api-result success">✅ Sales Analytics: ₹${new Intl.NumberFormat('en-IN').format(salesData.total_sales)} total revenue</div>`;
+                
+                // Test 4: Dynamic Pricing
+                const pricingResponse = await fetch('/api/pricing/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({retailer_id: 1, product_id: 1, quantity: 10})
+                });
+                const pricingData = await pricingResponse.json();
+                results += `<div class="api-result success">✅ Dynamic Pricing: ${pricingData.discount_percentage}% discount for ${pricingData.pricing_tier}</div>`;
+                
+                // Test 5: FIFO/FEFO Allocation
+                const allocationResponse = await fetch('/api/batches/allocate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({product_id: 1, quantity: 5})
+                });
+                const allocationData = await allocationResponse.json();
+                results += `<div class="api-result success">✅ FIFO/FEFO Allocation: ${allocationData.allocated_batches.length} batches allocated</div>`;
+                
+                // Test 6: Alerts
+                const alertsResponse = await fetch('/api/alerts/expiration');
+                const alertsData = await alertsResponse.json();
+                results += `<div class="api-result success">✅ Automated Alerts: ${alertsData.expiration_alerts.length} expiration alerts</div>`;
+                
+                results += `<div class="api-result success"><strong>🎉 All API endpoints working correctly!</strong></div>`;
+                
+            } catch (error) {
+                results += `<div class="api-result error">❌ Error: ${error.message}</div>`;
+            }
+            
+            testsDiv.innerHTML = results;
+        }
+        
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

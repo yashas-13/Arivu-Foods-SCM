@@ -5,20 +5,1225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arivu Foods SCMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #81C784;
+            --accent-color: #FFA726;
+            --danger-color: #EF5350;
+            --warning-color: #FFB74D;
+            --info-color: #42A5F5;
+            --light-bg: #F8F9FA;
+            --dark-text: #2C3E50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 76px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            border-radius: 0 15px 15px 0;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--dark-text);
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, var(--info-color), #64B5F6);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .metric-card.danger {
+            background: linear-gradient(135deg, var(--danger-color), #E57373);
+        }
+        
+        .metric-card.warning {
+            background: linear-gradient(135deg, var(--warning-color), #FFD54F);
+        }
+        
+        .metric-card.success {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .metric-card .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-card .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .alert-item {
+            border-left: 4px solid var(--danger-color);
+            background: rgba(239, 83, 80, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .alert-item.warning {
+            border-left-color: var(--warning-color);
+            background: rgba(255, 183, 77, 0.1);
+        }
+        
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 15px;
+        }
+        
+        .table td {
+            padding: 15px;
+            border: none;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .table tbody tr:hover {
+            background: rgba(46, 125, 50, 0.05);
+        }
+        
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-secondary-custom {
+            background: linear-gradient(135deg, #6c757d, #adb5bd);
+            color: white;
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(46, 125, 50, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .status-pending {
+            background: rgba(255, 183, 77, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-expired {
+            background: rgba(239, 83, 80, 0.1);
+            color: var(--danger-color);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar.show {
+                display: block;
+                position: fixed;
+                top: 76px;
+                left: 0;
+                width: 250px;
+                z-index: 1000;
+                height: calc(100vh - 76px);
+                overflow-y: auto;
+            }
+            
+            .content {
+                margin-left: 0 !important;
+            }
+            
+            .metric-card .metric-value {
+                font-size: 2rem;
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+    </style>
 </head>
-<body class="container py-5">
-    <h1 class="mb-3">Arivu Foods SCMS</h1>
-    <div id="status" class="alert alert-info">Checking API...</div>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-leaf"></i> Arivu Foods SCMS</a>
+            <button class="navbar-toggler d-lg-none" type="button" onclick="toggleSidebar()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-user-circle"></i> Admin User
+                </span>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-xl-2 px-0">
+                <div class="sidebar" id="sidebar">
+                    <div class="nav flex-column mt-3">
+                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('products')">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('batches')">
+                            <i class="fas fa-layer-group"></i> Batches
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('inventory')">
+                            <i class="fas fa-warehouse"></i> Inventory
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('retailers')">
+                            <i class="fas fa-store"></i> Retailers
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('orders')">
+                            <i class="fas fa-shopping-cart"></i> Orders
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('analytics')">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('alerts')">
+                            <i class="fas fa-bell"></i> Alerts
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9 col-xl-10 content" style="margin-left: 0;">
+                <div class="p-3">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard" class="content-section active">
+                        <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                        
+                        <!-- Key Metrics -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card success">
+                                    <div class="metric-value" id="totalProducts">0</div>
+                                    <div class="metric-label">Total Products</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card info">
+                                    <div class="metric-value" id="totalBatches">0</div>
+                                    <div class="metric-label">Total Batches</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card warning">
+                                    <div class="metric-value" id="activeOrders">0</div>
+                                    <div class="metric-label">Active Orders</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card danger">
+                                    <div class="metric-value" id="activeAlerts">0</div>
+                                    <div class="metric-label">Active Alerts</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-line"></i> Recent Orders
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recentOrders" class="table-responsive">
+                                            <p class="text-muted">Loading recent orders...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-exclamation-triangle"></i> Expiring Batches
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="expiringBatches">
+                                            <p class="text-muted">Loading expiring batches...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KPIs Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-dollar-sign"></i> Sales KPIs
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <h5 class="text-primary" id="totalRevenue">₹0</h5>
+                                                <small class="text-muted">Total Revenue</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class="text-success" id="avgOrderValue">₹0</h5>
+                                                <small class="text-muted">Avg Order Value</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class="text-info" id="ordersThisMonth">0</h5>
+                                                <small class="text-muted">Orders This Month</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-warehouse"></i> Inventory KPIs
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <h5 class="text-primary" id="totalInventoryValue">₹0</h5>
+                                                <small class="text-muted">Total Inventory Value</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class="text-warning" id="inventoryTurnover">0</h5>
+                                                <small class="text-muted">Inventory Turnover</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class="text-danger" id="lowStockItems">0</h5>
+                                                <small class="text-muted">Low Stock Items</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Section -->
+                    <div id="products" class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-box"></i> Products</h2>
+                            <button class="btn btn-primary-custom btn-custom" onclick="showAddProductModal()">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                        </div>
+                        
+                        <!-- Search and Filter -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" placeholder="Search products..." id="productSearch">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" id="productFilter">
+                                    <option value="">All Categories</option>
+                                    <option value="Snacks">Snacks</option>
+                                    <option value="Beverages">Beverages</option>
+                                    <option value="Dairy">Dairy</option>
+                                    <option value="Bakery">Bakery</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>SKU</th>
+                                                <th>Product Name</th>
+                                                <th>Category</th>
+                                                <th>MRP</th>
+                                                <th>Perishable</th>
+                                                <th>Shelf Life</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="productsTable">
+                                            <tr>
+                                                <td colspan="7" class="text-center">Loading products...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Batches Section -->
+                    <div id="batches" class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-layer-group"></i> Batches</h2>
+                            <button class="btn btn-primary-custom btn-custom" onclick="showAddBatchModal()">
+                                <i class="fas fa-plus"></i> Add Batch
+                            </button>
+                        </div>
+                        
+                        <!-- FIFO/FEFO Toggle -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="fefoToggle" checked>
+                                    <label class="form-check-label" for="fefoToggle">
+                                        <strong>FEFO (First Expiry First Out)</strong> - Prioritize batches by expiration date
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" id="batchProductFilter">
+                                    <option value="">All Products</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Batch ID</th>
+                                                <th>Product</th>
+                                                <th>Batch Number</th>
+                                                <th>Production Date</th>
+                                                <th>Expiry Date</th>
+                                                <th>Current Qty</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="batchesTable">
+                                            <tr>
+                                                <td colspan="8" class="text-center">Loading batches...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Section -->
+                    <div id="inventory" class="content-section">
+                        <h2 class="mb-4"><i class="fas fa-warehouse"></i> Inventory Status</h2>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>SKU</th>
+                                                <th>Batch</th>
+                                                <th>Expiry Date</th>
+                                                <th>Quantity</th>
+                                                <th>Reorder Point</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryTable">
+                                            <tr>
+                                                <td colspan="7" class="text-center">Loading inventory...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retailers Section -->
+                    <div id="retailers" class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-store"></i> Retailers</h2>
+                            <button class="btn btn-primary-custom btn-custom" onclick="showAddRetailerModal()">
+                                <i class="fas fa-plus"></i> Add Retailer
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Retailer Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>City</th>
+                                                <th>Pricing Tier</th>
+                                                <th>Discount Range</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="retailersTable">
+                                            <tr>
+                                                <td colspan="8" class="text-center">Loading retailers...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orders Section -->
+                    <div id="orders" class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-shopping-cart"></i> Orders</h2>
+                            <button class="btn btn-primary-custom btn-custom" onclick="showCreateOrderModal()">
+                                <i class="fas fa-plus"></i> Create Order
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Retailer</th>
+                                                <th>Order Date</th>
+                                                <th>Total Amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ordersTable">
+                                            <tr>
+                                                <td colspan="6" class="text-center">Loading orders...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Section -->
+                    <div id="analytics" class="content-section">
+                        <h2 class="mb-4"><i class="fas fa-chart-bar"></i> Analytics</h2>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-pie"></i> Sales by Product
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="productSalesChart">
+                                            <p class="text-muted">Loading sales data...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar"></i> Sales by Retailer
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="retailerSalesChart">
+                                            <p class="text-muted">Loading sales data...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Section -->
+                    <div id="alerts" class="content-section">
+                        <h2 class="mb-4"><i class="fas fa-bell"></i> Alerts & Notifications</h2>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-exclamation-triangle"></i> Expiration Alerts
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="expirationAlerts">
+                                            <p class="text-muted">Loading expiration alerts...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-box-open"></i> Low Stock Alerts
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="lowStockAlerts">
+                                            <p class="text-muted">Loading low stock alerts...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading data...</p>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
     <script>
-    // Simple call to backend health check
-    fetch('/api/health')
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('status').textContent = 'API status: ' + data.status;
-        })
-        .catch(() => {
-            document.getElementById('status').textContent = 'API not reachable';
+        // Global variables
+        let currentSection = 'dashboard';
+        let dashboardData = {};
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            // Auto-refresh dashboard every 30 seconds
+            setInterval(loadDashboard, 30000);
+        });
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Load section-specific data
+            loadSectionData(sectionName);
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Data loading functions
+        async function loadDashboard() {
+            try {
+                console.log('Loading dashboard data...');
+                const response = await fetch('/api/dashboard');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Dashboard data loaded:', data);
+                dashboardData = data;
+                
+                // Update metrics
+                document.getElementById('totalProducts').textContent = data.metrics.total_products;
+                document.getElementById('totalBatches').textContent = data.metrics.total_batches;
+                document.getElementById('activeOrders').textContent = data.metrics.active_orders;
+                document.getElementById('activeAlerts').textContent = data.metrics.active_alerts;
+                
+                // Update recent orders
+                updateRecentOrders(data.recent_orders);
+                
+                // Update expiring batches
+                updateExpiringBatches(data.expiring_batches);
+                
+                // Load KPIs
+                loadKPIs();
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        async function loadKPIs() {
+            try {
+                const response = await fetch('/api/dashboard/kpis');
+                const data = await response.json();
+                
+                // Update sales KPIs
+                document.getElementById('totalRevenue').textContent = '₹' + formatNumber(data.sales_kpis.total_revenue);
+                document.getElementById('avgOrderValue').textContent = '₹' + formatNumber(data.sales_kpis.average_order_value);
+                document.getElementById('ordersThisMonth').textContent = data.sales_kpis.orders_this_month;
+                
+                // Update inventory KPIs
+                document.getElementById('totalInventoryValue').textContent = '₹' + formatNumber(data.inventory_kpis.total_inventory_value);
+                document.getElementById('inventoryTurnover').textContent = data.inventory_kpis.inventory_turnover.toFixed(2);
+                document.getElementById('lowStockItems').textContent = data.inventory_kpis.low_stock_items;
+                
+            } catch (error) {
+                console.error('Error loading KPIs:', error);
+            }
+        }
+
+        function loadSectionData(sectionName) {
+            switch(sectionName) {
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'batches':
+                    loadBatches();
+                    break;
+                case 'inventory':
+                    loadInventory();
+                    break;
+                case 'retailers':
+                    loadRetailers();
+                    break;
+                case 'orders':
+                    loadOrders();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+                case 'alerts':
+                    loadAlerts();
+                    break;
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('productsTable');
+                if (data.products.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No products found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.products.map(product => `
+                    <tr>
+                        <td><code>${product.sku}</code></td>
+                        <td><strong>${product.product_name}</strong></td>
+                        <td>${product.category || 'N/A'}</td>
+                        <td>₹${formatNumber(product.mrp)}</td>
+                        <td><span class="status-badge ${product.is_perishable ? 'status-active' : 'status-pending'}">${product.is_perishable ? 'Yes' : 'No'}</span></td>
+                        <td>${product.shelf_life_days || 'N/A'} days</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${product.product_id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${product.product_id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsTable').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading products</td></tr>';
+            }
+        }
+
+        async function loadBatches() {
+            try {
+                const fefoEnabled = document.getElementById('fefoToggle').checked;
+                const sortParam = fefoEnabled ? 'expiration_date' : 'production_date';
+                
+                const response = await fetch(`/api/batches?sort=${sortParam}`);
+                const data = await response.json();
+                
+                const tbody = document.getElementById('batchesTable');
+                if (data.batches.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No batches found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.batches.map(batch => `
+                    <tr>
+                        <td><code>${batch.batch_id}</code></td>
+                        <td><strong>Product ID: ${batch.product_id}</strong></td>
+                        <td>${batch.manufacturer_batch_number}</td>
+                        <td>${formatDate(batch.production_date)}</td>
+                        <td>${formatDate(batch.expiration_date)}</td>
+                        <td>${formatNumber(batch.current_quantity)}</td>
+                        <td><span class="status-badge ${getStatusClass(batch.status)}">${batch.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="allocateBatch(${batch.batch_id})">
+                                <i class="fas fa-share-alt"></i> Allocate
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading batches:', error);
+                document.getElementById('batchesTable').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading batches</td></tr>';
+            }
+        }
+
+        async function loadInventory() {
+            try {
+                // Note: This endpoint doesn't exist yet, so we'll show a placeholder
+                const tbody = document.getElementById('inventoryTable');
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Inventory tracking coming soon...</td></tr>';
+                
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                document.getElementById('inventoryTable').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading inventory</td></tr>';
+            }
+        }
+
+        async function loadRetailers() {
+            try {
+                const response = await fetch('/api/retailers');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('retailersTable');
+                if (data.retailers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No retailers found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.retailers.map(retailer => `
+                    <tr>
+                        <td><strong>${retailer.retailer_name}</strong></td>
+                        <td>${retailer.email || 'N/A'}</td>
+                        <td>${retailer.phone_number || 'N/A'}</td>
+                        <td>${retailer.city || 'N/A'}</td>
+                        <td>${retailer.pricing_tier || 'Default'}</td>
+                        <td>${retailer.discount_range || 'N/A'}</td>
+                        <td><span class="status-badge ${getStatusClass(retailer.account_status)}">${retailer.account_status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editRetailer(${retailer.retailer_id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="calculatePricing(${retailer.retailer_id})">
+                                <i class="fas fa-calculator"></i> Pricing
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading retailers:', error);
+                document.getElementById('retailersTable').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading retailers</td></tr>';
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                // Placeholder for orders
+                const tbody = document.getElementById('ordersTable');
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Order management coming soon...</td></tr>';
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersTable').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading orders</td></tr>';
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/analytics/sales');
+                const data = await response.json();
+                
+                // Update product sales chart
+                const productSalesDiv = document.getElementById('productSalesChart');
+                if (data.product_sales.length === 0) {
+                    productSalesDiv.innerHTML = '<p class="text-muted">No sales data available</p>';
+                } else {
+                    productSalesDiv.innerHTML = data.product_sales.map(product => `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>${product.product_name}</span>
+                            <span><strong>₹${formatNumber(product.total_sales)}</strong></span>
+                        </div>
+                    `).join('');
+                }
+                
+                // Update retailer sales chart
+                const retailerSalesDiv = document.getElementById('retailerSalesChart');
+                if (data.retailer_sales.length === 0) {
+                    retailerSalesDiv.innerHTML = '<p class="text-muted">No sales data available</p>';
+                } else {
+                    retailerSalesDiv.innerHTML = data.retailer_sales.map(retailer => `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>${retailer.retailer_name}</span>
+                            <span><strong>₹${formatNumber(retailer.total_sales)}</strong> (${retailer.order_count} orders)</span>
+                        </div>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('productSalesChart').innerHTML = '<p class="text-danger">Error loading sales data</p>';
+                document.getElementById('retailerSalesChart').innerHTML = '<p class="text-danger">Error loading sales data</p>';
+            }
+        }
+
+        async function loadAlerts() {
+            try {
+                // Load expiration alerts
+                const expirationResponse = await fetch('/api/alerts/expiration');
+                const expirationData = await expirationResponse.json();
+                
+                const expirationDiv = document.getElementById('expirationAlerts');
+                if (expirationData.expiration_alerts.length === 0) {
+                    expirationDiv.innerHTML = '<p class="text-muted">No expiration alerts</p>';
+                } else {
+                    expirationDiv.innerHTML = expirationData.expiration_alerts.map(alert => `
+                        <div class="alert-item ${alert.severity === 'High' ? 'danger' : 'warning'}">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>${alert.product_name}</strong><br>
+                                    <small>Batch: ${alert.manufacturer_batch_number}</small><br>
+                                    <small>Expires: ${formatDate(alert.expiration_date)} (${alert.days_to_expiry} days)</small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-${alert.severity === 'High' ? 'danger' : 'warning'}">${alert.severity}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Load low stock alerts
+                const lowStockResponse = await fetch('/api/alerts/low-stock');
+                const lowStockData = await lowStockResponse.json();
+                
+                const lowStockDiv = document.getElementById('lowStockAlerts');
+                if (lowStockData.low_stock_alerts.length === 0) {
+                    lowStockDiv.innerHTML = '<p class="text-muted">No low stock alerts</p>';
+                } else {
+                    lowStockDiv.innerHTML = lowStockData.low_stock_alerts.map(alert => `
+                        <div class="alert-item ${alert.severity === 'High' ? 'danger' : 'warning'}">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>${alert.product_name}</strong><br>
+                                    <small>SKU: ${alert.sku}</small><br>
+                                    <small>Current Stock: ${alert.current_stock} | Reorder Point: ${alert.reorder_point}</small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-${alert.severity === 'High' ? 'danger' : 'warning'}">${alert.severity}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                document.getElementById('expirationAlerts').innerHTML = '<p class="text-danger">Error loading expiration alerts</p>';
+                document.getElementById('lowStockAlerts').innerHTML = '<p class="text-danger">Error loading low stock alerts</p>';
+            }
+        }
+
+        // Helper functions
+        function updateRecentOrders(orders) {
+            const div = document.getElementById('recentOrders');
+            if (orders.length === 0) {
+                div.innerHTML = '<p class="text-muted">No recent orders</p>';
+                return;
+            }
+            
+            div.innerHTML = `
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Retailer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orders.map(order => `
+                            <tr>
+                                <td><code>${order.order_id}</code></td>
+                                <td>${order.retailer_name}</td>
+                                <td>₹${formatNumber(order.total_amount)}</td>
+                                <td><span class="status-badge ${getStatusClass(order.status)}">${order.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateExpiringBatches(batches) {
+            const div = document.getElementById('expiringBatches');
+            if (batches.length === 0) {
+                div.innerHTML = '<p class="text-muted">No batches expiring soon</p>';
+                return;
+            }
+            
+            div.innerHTML = batches.map(batch => `
+                <div class="alert-item warning">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${batch.product_name}</strong><br>
+                            <small>Batch: ${batch.batch_id}</small><br>
+                            <small>Expires: ${formatDate(batch.expiration_date)}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-warning">${formatNumber(batch.current_quantity)} units</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(num);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-IN');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Active':
+                case 'In Stock':
+                case 'Delivered':
+                    return 'status-active';
+                case 'Pending':
+                case 'Processing':
+                    return 'status-pending';
+                case 'Expired':
+                case 'Cancelled':
+                case 'Inactive':
+                    return 'status-expired';
+                default:
+                    return 'status-pending';
+            }
+        }
+
+        function showError(message) {
+            // You can implement a toast notification here
+            alert(message);
+        }
+
+        // Placeholder functions for modals and actions
+        function showAddProductModal() {
+            alert('Add Product modal - Coming soon!');
+        }
+
+        function showAddBatchModal() {
+            alert('Add Batch modal - Coming soon!');
+        }
+
+        function showAddRetailerModal() {
+            alert('Add Retailer modal - Coming soon!');
+        }
+
+        function showCreateOrderModal() {
+            alert('Create Order modal - Coming soon!');
+        }
+
+        function editProduct(productId) {
+            alert(`Edit Product ${productId} - Coming soon!`);
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                alert(`Delete Product ${productId} - Coming soon!`);
+            }
+        }
+
+        function allocateBatch(batchId) {
+            alert(`Allocate Batch ${batchId} - Coming soon!`);
+        }
+
+        function editRetailer(retailerId) {
+            alert(`Edit Retailer ${retailerId} - Coming soon!`);
+        }
+
+        function calculatePricing(retailerId) {
+            alert(`Calculate Pricing for Retailer ${retailerId} - Coming soon!`);
+        }
+
+        // FEFO toggle handler
+        document.getElementById('fefoToggle').addEventListener('change', function() {
+            if (currentSection === 'batches') {
+                loadBatches();
+            }
+        });
+
+        // Search functionality
+        document.getElementById('productSearch').addEventListener('input', function() {
+            // Implement search functionality
+            console.log('Search:', this.value);
         });
     </script>
 </body>
