@@ -5,22 +5,594 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arivu Foods SCMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .alert-card {
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .alert-expiration {
+            border-left: 4px solid #f39c12;
+            background-color: #fdf2e9;
+        }
+        .alert-low-stock {
+            border-left: 4px solid #e74c3c;
+            background-color: #fadbd8;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+        .nav-tabs .nav-link {
+            border-radius: 20px 20px 0 0;
+            border: none;
+            background: #f8f9fa;
+            margin-right: 0.25rem;
+        }
+        .nav-tabs .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        .spinner-border {
+            color: #667eea;
+        }
+        .badge {
+            font-size: 0.75rem;
+        }
+        .batch-status-received { background-color: #17a2b8; }
+        .batch-status-in-stock { background-color: #28a745; }
+        .batch-status-dispatched { background-color: #ffc107; color: #212529; }
+        .batch-status-expired { background-color: #dc3545; }
+        .batch-status-recalled { background-color: #6c757d; }
+        
+        @media (max-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+            .stat-card .stat-value {
+                font-size: 1.5rem;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
 </head>
-<body class="container py-5">
-    <h1 class="mb-3">Arivu Foods SCMS</h1>
-    <div id="status" class="alert alert-info">Checking API...</div>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fas fa-truck me-2"></i>Arivu Foods SCMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dashboard"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products"><i class="fas fa-box me-1"></i>Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#batches"><i class="fas fa-layer-group me-1"></i>Batches</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#orders"><i class="fas fa-shopping-cart me-1"></i>Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#retailers"><i class="fas fa-store me-1"></i>Retailers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#alerts"><i class="fas fa-bell me-1"></i>Alerts <span id="alert-count" class="badge bg-danger"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <script>
-    // Simple call to backend health check
-    fetch('/api/health')
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('status').textContent = 'API status: ' + data.status;
-        })
-        .catch(() => {
-            document.getElementById('status').textContent = 'API not reachable';
-        });
-    </script>
+    <div class="container mt-4">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section">
+            <div class="dashboard-header text-center">
+                <h1><i class="fas fa-chart-line me-2"></i>Supply Chain Dashboard</h1>
+                <p class="mb-0">Real-time insights into your food distribution operations</p>
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div class="row" id="dashboard-metrics">
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card text-center">
+                        <h3><i class="fas fa-dollar-sign"></i> Total Sales</h3>
+                        <div class="stat-value" id="total-sales">-</div>
+                        <small class="text-muted">This Month</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card text-center">
+                        <h3><i class="fas fa-boxes"></i> Total Inventory</h3>
+                        <div class="stat-value" id="total-inventory">-</div>
+                        <small class="text-muted">Value</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card text-center">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Low Stock</h3>
+                        <div class="stat-value text-warning" id="low-stock-count">-</div>
+                        <small class="text-muted">Items</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stat-card text-center">
+                        <h3><i class="fas fa-calendar-times"></i> Expiring Soon</h3>
+                        <div class="stat-value text-danger" id="expiring-count">-</div>
+                        <small class="text-muted">Batches</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bell me-2"></i>Recent Alerts</h5>
+                        </div>
+                        <div class="card-body" id="recent-alerts">
+                            <div class="loading">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div id="products" class="section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-box me-2"></i>Product Management</h2>
+                <button class="btn btn-primary" onclick="showAddProductModal()">
+                    <i class="fas fa-plus me-2"></i>Add Product
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>MRP</th>
+                                    <th>Shelf Life</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading products...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batches Section -->
+        <div id="batches" class="section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-layer-group me-2"></i>Batch Management</h2>
+                <button class="btn btn-primary" onclick="showAddBatchModal()">
+                    <i class="fas fa-plus me-2"></i>Add Batch
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Batch Number</th>
+                                    <th>Product</th>
+                                    <th>Production Date</th>
+                                    <th>Expiration Date</th>
+                                    <th>Current Qty</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batches-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading batches...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="orders" class="section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-shopping-cart me-2"></i>Order Management</h2>
+                <button class="btn btn-primary" onclick="showAddOrderModal()">
+                    <i class="fas fa-plus me-2"></i>Create Order
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Retailer</th>
+                                    <th>Order Date</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading orders...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retailers Section -->
+        <div id="retailers" class="section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-store me-2"></i>Retailer Management</h2>
+                <button class="btn btn-primary" onclick="showAddRetailerModal()">
+                    <i class="fas fa-plus me-2"></i>Add Retailer
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Retailer Name</th>
+                                    <th>Contact Person</th>
+                                    <th>City</th>
+                                    <th>Pricing Tier</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="retailers-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading retailers...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div id="alerts" class="section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bell me-2"></i>Alert Management</h2>
+                <div>
+                    <button class="btn btn-warning" onclick="generateExpirationAlerts()">
+                        <i class="fas fa-calendar-times me-2"></i>Generate Expiration Alerts
+                    </button>
+                    <button class="btn btn-danger" onclick="generateLowStockAlerts()">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Generate Low Stock Alerts
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body" id="alerts-container">
+                    <div class="loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm">
+                        <div class="mb-3">
+                            <label for="productSku" class="form-label">SKU</label>
+                            <input type="text" class="form-control" id="productSku" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productCategory" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="productCategory">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productBrand" class="form-label">Brand</label>
+                            <input type="text" class="form-control" id="productBrand">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productMrp" class="form-label">MRP</label>
+                            <input type="number" step="0.01" class="form-control" id="productMrp" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productShelfLife" class="form-label">Shelf Life (Days)</label>
+                            <input type="number" class="form-control" id="productShelfLife">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productWeight" class="form-label">Weight per Unit</label>
+                            <input type="number" step="0.001" class="form-control" id="productWeight">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productUnitOfMeasure" class="form-label">Unit of Measure</label>
+                            <select class="form-select" id="productUnitOfMeasure">
+                                <option value="">Select unit</option>
+                                <option value="kg">Kilogram</option>
+                                <option value="g">Gram</option>
+                                <option value="l">Liter</option>
+                                <option value="ml">Milliliter</option>
+                                <option value="pcs">Pieces</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="productDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Batch Modal -->
+    <div class="modal fade" id="addBatchModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Batch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBatchForm">
+                        <div class="mb-3">
+                            <label for="batchProductId" class="form-label">Product</label>
+                            <select class="form-select" id="batchProductId" required>
+                                <option value="">Select product</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchNumber" class="form-label">Batch Number</label>
+                            <input type="text" class="form-control" id="batchNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchProductionDate" class="form-label">Production Date</label>
+                            <input type="date" class="form-control" id="batchProductionDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchExpirationDate" class="form-label">Expiration Date</label>
+                            <input type="date" class="form-control" id="batchExpirationDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchInitialQuantity" class="form-label">Initial Quantity</label>
+                            <input type="number" step="0.01" class="form-control" id="batchInitialQuantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchCurrentQuantity" class="form-label">Current Quantity</label>
+                            <input type="number" step="0.01" class="form-control" id="batchCurrentQuantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="batchManufacturingLocation" class="form-label">Manufacturing Location</label>
+                            <input type="text" class="form-control" id="batchManufacturingLocation">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addBatch()">Add Batch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Retailer Modal -->
+    <div class="modal fade" id="addRetailerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Retailer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRetailerForm">
+                        <div class="mb-3">
+                            <label for="retailerName" class="form-label">Retailer Name</label>
+                            <input type="text" class="form-control" id="retailerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerContactPerson" class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="retailerContactPerson">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="retailerEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerPhone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="retailerPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="retailerAddress" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="retailerCity">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerState" class="form-label">State</label>
+                            <input type="text" class="form-control" id="retailerState">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerZipCode" class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" id="retailerZipCode">
+                        </div>
+                        <div class="mb-3">
+                            <label for="retailerPricingTier" class="form-label">Pricing Tier</label>
+                            <select class="form-select" id="retailerPricingTier">
+                                <option value="">Select pricing tier</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addRetailer()">Add Retailer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Order Modal -->
+    <div class="modal fade" id="addOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addOrderForm">
+                        <div class="mb-3">
+                            <label for="orderRetailerId" class="form-label">Retailer</label>
+                            <select class="form-select" id="orderRetailerId" required>
+                                <option value="">Select retailer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="orderDeliveryAddress" class="form-label">Delivery Address</label>
+                            <textarea class="form-control" id="orderDeliveryAddress" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="orderExpectedDeliveryDate" class="form-label">Expected Delivery Date</label>
+                            <input type="date" class="form-control" id="orderExpectedDeliveryDate">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Order Items</label>
+                            <div id="orderItems">
+                                <div class="order-item row mb-2">
+                                    <div class="col-md-6">
+                                        <select class="form-select" name="productId" required>
+                                            <option value="">Select product</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="number" class="form-control" name="quantity" placeholder="Quantity" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger" onclick="removeOrderItem(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="addOrderItem()">
+                                <i class="fas fa-plus me-2"></i>Add Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createOrder()">Create Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
 
