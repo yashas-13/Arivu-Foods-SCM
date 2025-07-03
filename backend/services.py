@@ -251,7 +251,11 @@ class AlertService:
         """Check for low stock levels."""
         low_stock_items = db.session.query(
             Product, Inventory, Batch
-        ).join(Batch).join(Inventory).filter(
+        ).select_from(Product).join(
+            Batch, Product.product_id == Batch.product_id
+        ).join(
+            Inventory, Batch.batch_id == Inventory.batch_id
+        ).filter(
             Inventory.quantity_on_hand <= Inventory.reorder_point
         ).all()
         

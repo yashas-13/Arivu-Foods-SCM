@@ -131,7 +131,7 @@ def create_batch():
     return jsonify({'message': 'Batch created successfully', 'batch_id': batch.batch_id}), 201
 
 
-@bp.route('/batches/<int:batch_id>/allocate', methods=['POST'])
+@bp.route('/batches/allocate', methods=['POST'])
 def allocate_batch():
     """Allocate quantity from a batch using FIFO/FEFO logic."""
     data = request.get_json()
